@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
+from blog.models import Post
 from blog.tests.test_modelmixintestcase import ModelMixinTestCase
 
 
@@ -8,6 +9,26 @@ class TestListView(ModelMixinTestCase, TestCase):
         response = self.client.get(reverse("blog:post_list"))
 
         self.assertTemplateUsed(response, "blog/post/list.html")
+
+    def test_pagination_returns_last_page_if_page_out_of_range(self):
+        response = self.client.get(
+            reverse("blog:post_list"),
+            {"page": 999, "posts": self.create_published_posts(4)},
+        )
+        self.assertEquals(
+            response.context["posts"].number,
+            response.context["posts"].paginator.page(2).number,
+        )
+
+    def test_pagination_returns_first_page_if_page_is_empty(self):
+        response = self.client.get(
+            reverse("blog:post_list"),
+            {"page": "", "posts": self.create_published_posts(4)},
+        )
+        self.assertEquals(
+            response.context["posts"].number,
+            response.context["posts"].paginator.page(1).number,
+        )
 
 
 class TestDetailView(ModelMixinTestCase, TestCase):
