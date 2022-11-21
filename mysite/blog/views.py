@@ -32,15 +32,6 @@ def get(self, request):
     )
 
 
-def post_list(request):
-    posts = paginate(Post.published.all(), request.GET.get("page"), 3)
-    return render(
-        request,
-        "blog/post/list.html",
-        {"page": request.GET.get("page"), "posts": posts},
-    )
-
-
 def post_detail(request, year, month, day, post):
     post = get_object_or_404(
         Post,
