@@ -1,11 +1,13 @@
 from django.shortcuts import render, get_object_or_404
-from .models import Post
+from .models import Post, Comment
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic import ListView, FormView
-from .forms import EmailPostForm
+from .forms import EmailPostForm, CommentForm
 from django.core.mail import send_mail
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib import messages
+from django.shortcuts import redirect
 
 
 class PostListView(ListView):
@@ -36,6 +38,14 @@ def get(self, request):
     )
 
 
+def add_comment(comment_form, post):
+    if comment_form.is_valid():
+        comment = comment_form.save(commit=False)
+        comment.post = post
+        comment.save()
+        return comment
+
+
 def post_detail(request, year, month, day, post):
     post = get_object_or_404(
         Post,
@@ -45,7 +55,22 @@ def post_detail(request, year, month, day, post):
         publish__month=month,
         publish__day=day,
     )
-    return render(request, "blog/post/detail.html", {"post": post})
+    comment_form = CommentForm(data=request.POST or None)
+    comments = add_comment(comment_form, post)
+    comment_form = CommentForm()
+    redirect(reverse("blog:post_detail", args=[year, month, day, post.slug]))
+    messages.success(request, message="Comment added successfully")
+
+    comments = Comment.activated.filter(post=post)
+    return render(
+        request,
+        "blog/post/detail.html",
+        {
+            "post": post,
+            "comments": comments,
+            "comment_form": comment_form,
+        },
+    )
 
 
 class PostShareView(SuccessMessageMixin, FormView):
