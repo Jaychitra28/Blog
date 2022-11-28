@@ -15,4 +15,9 @@ urlpatterns = [
         views.PostShareView.as_view(),
         name="post_share",
     ),
+    path(
+        "tag/<slug:tag_slug>/",
+        views.PostListByTagview.as_view(),
+        name="post_list_by_tag",
+    ),
 ]
