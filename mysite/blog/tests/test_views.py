@@ -10,7 +10,7 @@ class TestListView(ModelMixinTestCase, TestCase):
 
         self.assertTemplateUsed(response, "blog/post/list.html")
 
-    def test_pagination_returns_last_page_if_page_out_of_range(self):
+    def test_pagination_returns_404_if_page_out_of_range(self):
         response = self.client.get(
             reverse("blog:post_list"),
             {"page": 999, "posts": self.create_published_posts(4)},
@@ -20,7 +20,7 @@ class TestListView(ModelMixinTestCase, TestCase):
     def test_pagination_returns_404_if_String_is_passed_in_page(self):
         response = self.client.get(
             reverse("blog:post_list"),
-            {"page": "", "posts": self.create_published_posts(4)},
+            {"page": "test", "posts": self.create_published_posts(4)},
         )
         self.assertEquals(response.status_code, 404)
 
