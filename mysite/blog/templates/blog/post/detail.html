@@ -11,4 +11,27 @@
         Share this post
         </a>
     </p>
+    {% with post.get_active_comments.count as total_comments %}
+    <h2>
+      {{ total_comments }} comment{{ total_comments|pluralize }}
+    </h2>
+  {% endwith %}
+  {% for comment in post.get_active_comments %}
+    <div class="comment">
+      <p class="info">
+        Comment {{ forloop.counter }} by {{ comment.name }}
+        {{ comment.created }}
+      </p>
+      {{ comment.body|linebreaks }}
+    </div>
+  {% empty %}
+    <p>There are no comments yet.</p>
+  {% endfor %}
+    <h2>Add a new comment</h2>
+    <form method="post" action="{% url 'blog:add_comment' post.id %}">
+      {{ comment_form.as_p }}
+      {% csrf_token %}
+      <p><input type="submit" value="Add comment"></p>
+    </form>
+
 {% endblock %}
