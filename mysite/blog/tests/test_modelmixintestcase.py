@@ -10,8 +10,6 @@ class ModelMixinTestCase(TestCase):
             password="1234",
         )
 
-        self.published_queryset = Post.published.all()
-
         self.draft_post = Post.objects.create(
             title="Draft",
             author=self.user,
@@ -25,3 +23,16 @@ class ModelMixinTestCase(TestCase):
             status="published",
             slug="published",
         )
+
+    def create_published_posts(self, count):
+        posts = []
+        for _ in range(count):
+            post = Post.objects.create(
+                title="Published2",
+                author=self.user,
+                body="Testing Published2",
+                status="published",
+                slug="published2",
+            )
+            posts.append(post)
+        return posts
