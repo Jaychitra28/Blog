@@ -6,6 +6,7 @@ from django.core.mail import send_mail
 from django.urls import reverse_lazy, reverse
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
+from taggit.models import Tag
 
 
 class PostListView(ListView):
@@ -50,6 +51,7 @@ def post_detail(request, year, month, day, post):
         publish__month=month,
         publish__day=day,
     )
+
     return render(
         request,
         "blog/post/detail.html",
@@ -60,11 +62,29 @@ def post_detail(request, year, month, day, post):
     )
 
 
+class PostListByTagview(ListView):
+    context_object_name = "posts"
+    paginate_by = 3
+    template_name = "blog/post/list.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        self.tag = get_object_or_404(Tag, slug=self.kwargs.get("tag_slug"))
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return Post.published.filter(tags__in=[self.tag])
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data["tag"] = self.tag
+        return data
+
+
 class PostShareView(SuccessMessageMixin, FormView):
     form_class = EmailPostForm
     template_name = "blog/post/share.html"
     success_url = reverse_lazy("blog:post_list")
-    success_message = "Mail send Successfully"
+    success_message = "mail sent"
 
     def dispatch(self, request, *args, **kwargs):
         self.post_object = get_object_or_404(
