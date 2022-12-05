@@ -84,7 +84,7 @@ class PostShareView(SuccessMessageMixin, FormView):
     form_class = EmailPostForm
     template_name = "blog/post/share.html"
     success_url = reverse_lazy("blog:post_list")
-    success_message = "mail sent"
+    success_message = "Mail send Successfully"
 
     def dispatch(self, request, *args, **kwargs):
         self.post_object = get_object_or_404(
