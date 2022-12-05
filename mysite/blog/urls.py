@@ -15,4 +15,5 @@ urlpatterns = [
         views.PostShareView.as_view(),
         name="post_share",
     ),
+    path("<int:post_id>/comment/", views.add_comment, name="add_comment"),
 ]
