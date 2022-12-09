@@ -1,5 +1,5 @@
 from django.test import TestCase, Client
-from blog.models import Post
+from blog.models import Post, Comment
 from django.contrib.auth.models import User
 
 
@@ -36,3 +36,13 @@ class ModelMixinTestCase(TestCase):
             )
             posts.append(post)
         return posts
+
+    def create_commented_posts(self, post, count):
+        for _ in range(count):
+            Comment.objects.create(
+                name="user",
+                email="sreesanjai28@gmail.com",
+                body="comments",
+                post=post,
+            )
+        return post
