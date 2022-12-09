@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .feeds import LatestPostsFeed
 
 app_name = "blog"
 
@@ -21,4 +22,5 @@ urlpatterns = [
         views.PostListByTagview.as_view(),
         name="post_list_by_tag",
     ),
+    path("feed/", LatestPostsFeed(), name="post_feed"),
 ]
